@@ -25,8 +25,11 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
   cmake_path(CONVERT "${VS_ROOT}" TO_CMAKE_PATH_LIST VS_ROOT NORMALIZE)
 
   find_program(VCPKG NAMES vcpkg PATHS "${VS_ROOT}/VC/vcpkg")
-else()
+elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
   find_program(VCPKG NAMES vcpkg)
+  set(VCPKG_TARGET_TRIPLET "x64-linux")
+else()
+  message(FATAL_ERROR "Unsupported host system: ${CMAKE_HOST_SYSTEM_NAME}")
 endif()
 
 if(VCPKG)
