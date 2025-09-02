@@ -44,3 +44,5 @@ public:
 private:
   std::deque<std::string> queue_;
 };
+
+#define logger logger
