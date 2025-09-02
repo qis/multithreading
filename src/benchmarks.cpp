@@ -34,9 +34,9 @@ std::jthread create_logger() {
   return thread;
 }
 
-class TestReporter : public benchmark::ConsoleReporter {
+class reporter : public benchmark::ConsoleReporter {
 public:
-  TestReporter() : stdout_{dup(fileno(stdout))} {
+  reporter() : stdout_{dup(fileno(stdout))} {
     if (stdout_ == -1) {
       throw std::system_error{
         std::error_code{errno, std::system_category()},
@@ -52,12 +52,12 @@ public:
       "w", stdout);
   }
 
-  TestReporter(TestReporter&& other) = delete;
-  TestReporter(const TestReporter& other) = delete;
-  TestReporter& operator=(TestReporter&& other) = delete;
-  TestReporter& operator=(const TestReporter& other) = delete;
+  reporter(reporter&& other) = delete;
+  reporter(const reporter& other) = delete;
+  reporter& operator=(reporter&& other) = delete;
+  reporter& operator=(const reporter& other) = delete;
 
-  ~TestReporter() {
+  ~reporter() {
     fflush(stdout);
     (void)dup2(stdout_, fileno(stdout));
     close(stdout_);
@@ -81,7 +81,7 @@ int main(int argc, char** argv) {
   std::list<std::jthread> threads;
   threads.emplace_back(create_logger<logger>());
 
-  TestReporter reporter;
+  reporter reporter;
   benchmark::RunSpecifiedBenchmarks(&reporter);
   for (auto& thread : threads) {
     thread.request_stop();

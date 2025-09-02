@@ -26,7 +26,7 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
 
   find_program(VCPKG NAMES vcpkg PATHS "${VS_ROOT}/VC/vcpkg")
 elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
-  find_program(VCPKG NAMES vcpkg)
+  find_program(VCPKG NAMES vcpkg PATHS /opt/vcpkg)
   set(VCPKG_TARGET_TRIPLET "x64-linux")
 else()
   message(FATAL_ERROR "Unsupported host system: ${CMAKE_HOST_SYSTEM_NAME}")

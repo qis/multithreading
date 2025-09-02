@@ -46,17 +46,6 @@ env --chdir=gcc/build ../configure --prefix=/opt/gcc --enable-languages=c,c++ --
 env --chdir=gcc/build make -j$(nproc)
 env --chdir=gcc/build sudo make install
 
-# Install Vcpkg.
-sudo mkdir /opt/vcpkg
-sudo chown $(id -u):$(id -g) /opt/vcpkg
-git clone https://github.com/microsoft/vcpkg /opt/vcpkg
-env --chdir=/opt/vcpkg ./bootstrap-vcpkg.sh -disableMetrics
-sudo tee /etc/profile.d/vcpkg.sh >/dev/null <<'EOF'
-export PATH="/opt/vcpkg:${PATH}"
-EOF
-sudo chmod 0755 /etc/profile.d/vcpkg.sh
-source /etc/profile.d/vcpkg.sh
-
 # Build and run project.
 cd multithreading
 
@@ -66,4 +55,14 @@ LD_LIBRARY_PATH=/opt/gcc/lib64 build/debug/bin/multithreading
 LD_LIBRARY_PATH=/opt/gcc/lib64 CXX=/opt/gcc/bin/g++ cmake --workflow release
 LD_LIBRARY_PATH=/opt/gcc/lib64 build/release/bin/multithreading
 LD_LIBRARY_PATH=/opt/gcc/lib64 build/release/bin/benchmarks
+```
+
+Instructions for any Linux if `vcpkg` is not in `PATH` or `/opt/vcpkg`.
+
+```sh
+# Install Vcpkg.
+sudo mkdir /opt/vcpkg
+sudo chown $(id -u):$(id -g) /opt/vcpkg
+git clone https://github.com/microsoft/vcpkg /opt/vcpkg
+env --chdir=/opt/vcpkg ./bootstrap-vcpkg.sh -disableMetrics
 ```
