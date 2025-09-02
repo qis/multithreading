@@ -2,7 +2,11 @@
 
 int main() {
   try {
+#ifdef logger_with_coroutines_fast
+    logger_with_coroutines_fast logger;
+#else
     logger logger;
+#endif
     std::list<std::jthread> threads;
     std::atomic_int threads_counter{1};
     std::generate_n(std::back_inserter(threads), 3u, [&] {
