@@ -54,12 +54,6 @@ LD_LIBRARY_PATH=/opt/gcc/lib64 build/debug/bin/multithreading
 
 LD_LIBRARY_PATH=/opt/gcc/lib64 CXX=/opt/gcc/bin/g++ cmake --workflow release
 LD_LIBRARY_PATH=/opt/gcc/lib64 build/release/bin/multithreading
-
-# Run benchmarks.
-sudo cpupower frequency-info
-sudo cpupower frequency-set -g performance
-LD_LIBRARY_PATH=/opt/gcc/lib64 setarch -R build/release/bin/benchmarks
-sudo cpupower frequency-set -g powersave
 ```
 
 Instructions for any Linux if `vcpkg` is not in `PATH` or `/opt/vcpkg`.
@@ -70,4 +64,12 @@ sudo mkdir /opt/vcpkg
 sudo chown $(id -u):$(id -g) /opt/vcpkg
 git clone https://github.com/microsoft/vcpkg /opt/vcpkg
 env --chdir=/opt/vcpkg ./bootstrap-vcpkg.sh -disableMetrics
+```
+
+Run benchmarks if the `benchmark` library or `vcpkg` are available.
+
+```sh
+sudo cpupower frequency-info
+sudo cpupower frequency-set -g performance
+LD_LIBRARY_PATH=/opt/gcc/lib64 setarch -R build/release/bin/benchmarks
 ```
