@@ -14,14 +14,22 @@ Logger& get_logger() {
 }
 
 template <class T>
-static void multithreading(benchmark::State& state) {
+static void string(benchmark::State& state) {
   auto& logger = get_logger<T>();
-  const std::string str{"test"};
+  const std::string s{"benchmark\n"};
   for (auto _ : state)
-    logger.post(str);
+    logger.post(s);
 }
 
-BENCHMARK(multithreading<logger>)->Threads(8);
+template <class T>
+static void string_literal(benchmark::State& state) {
+  auto& logger = get_logger<T>();
+  for (auto _ : state)
+    logger.post("benchmark\n");
+}
+
+BENCHMARK(string<logger>)->Threads(8)->MinTime(3.0);
+BENCHMARK(string_literal<logger>)->Threads(8)->MinTime(3.0);
 
 template <class T>
 std::jthread create_logger() {

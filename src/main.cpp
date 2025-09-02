@@ -17,6 +17,7 @@ int main() {
       logger.run(stop);
     }};
     threads.clear();
+    logger.post("[0] done\n");
   }
   catch (const std::exception& e) {
     std::cerr << "Error: " << e.what() << '\n';

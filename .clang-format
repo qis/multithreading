@@ -70,7 +70,7 @@ SkipMacroDefinitionBody: true
 
 # Empty Lines
 EmptyLineBeforeAccessModifier: LogicalBlock
-SeparateDefinitionBlocks: Always
+SeparateDefinitionBlocks: Leave
 MaxEmptyLinesToKeep: 2
 
 # Comments
