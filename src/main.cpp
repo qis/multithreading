@@ -2,8 +2,8 @@
 
 int main() {
   try {
-#ifdef logger_with_coroutines_fast
-    logger_with_coroutines_fast logger;
+#ifdef logger_with_tbb
+    logger_with_tbb logger;
 #else
     logger logger;
 #endif

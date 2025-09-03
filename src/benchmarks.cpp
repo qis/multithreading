@@ -1,26 +1,28 @@
-// Run on (16 X 2904 MHz CPU s)
+// min_time:3.000/threads:16
+// Run on (16 X 2357.91 MHz CPU s)
 // CPU Caches:
 //   L1 Data 32 KiB (x8)
 //   L1 Instruction 32 KiB (x8)
-//   L2 Unified 256 KiB (x8)
+//   L2 Unified 512 KiB (x8)
 //   L3 Unified 16384 KiB (x1)
+// Load Average: 1.07, 1.00, 0.61
 // -------------------------------------------------------------------------------------------------
 // Benchmark                                                       Time             CPU   Iterations
 // -------------------------------------------------------------------------------------------------
-// string<logger_with_mutex>                                    3144 ns         1059 ns      3525248
-// string_literal<logger_with_mutex>                            2906 ns          586 ns      5811888
-// string<logger_with_condition_variable>                        593 ns          605 ns      6720000
-// string_literal<logger_with_condition_variable>                606 ns          607 ns      5973336
-// string<logger_with_semaphore>                                 636 ns          636 ns      5973336
-// string_literal<logger_with_semaphore>                         691 ns          681 ns      6720000
-// string<logger_with_atomic_wait>                               575 ns          578 ns      7168000
-// string_literal<logger_with_atomic_wait>                       583 ns          576 ns      8270768
-// string<logger_with_atomic_wait_and_malloc>                    540 ns          540 ns      7964448
-// string_literal<logger_with_atomic_wait_and_malloc>            533 ns          532 ns      7168000
-// string<logger_with_coroutines>                                571 ns          569 ns      7964448
-// string_literal<logger_with_coroutines>                        507 ns          511 ns      8960000
-// string<logger_with_coroutines_fast>                           614 ns          621 ns      7168000
-// string_literal<logger_with_coroutines_fast>                   587 ns          597 ns      7168000
+// string<logger_with_mutex>                                    4777 ns         2717 ns      2153040
+// string_literal<logger_with_mutex>                            4683 ns         2591 ns      1618288
+// string<logger_with_condition_variable>                       2848 ns         1001 ns      4217616
+// string_literal<logger_with_condition_variable>               2845 ns         1002 ns      4203792
+// string<logger_with_semaphore>                                2845 ns          982 ns      4224960
+// string_literal<logger_with_semaphore>                        2839 ns          977 ns      4314304
+// string<logger_with_atomic_wait>                              2867 ns          994 ns      4208896
+// string_literal<logger_with_atomic_wait>                      2849 ns          983 ns      4269856
+// string<logger_with_atomic_wait_and_malloc>                   1653 ns          412 ns     10171040
+// string_literal<logger_with_atomic_wait_and_malloc>           1747 ns          426 ns     10266176
+// string<logger_with_coroutines>                               4930 ns         1713 ns      2475920
+// string_literal<logger_with_coroutines>                       3265 ns         1178 ns      3582896
+// string<logger_with_coroutines_fast>                          3336 ns         1223 ns      3422688
+// string_literal<logger_with_coroutines_fast>                  1854 ns          514 ns      8178960
 
 #include "logger.hpp"
 #include <benchmark/benchmark.h>
@@ -37,10 +39,13 @@ Logger& get_logger() {
   return logger;
 }
 
+// Make sure we're posting a dynamically allocated string.
+static_assert(std::string{}.capacity() < 20);
+
 template <class T>
 static void string(benchmark::State& state) {
   auto& logger = get_logger<T>();
-  const std::string s{"benchmark\n"};
+  const std::string s{"12345678901234567890\n"};
   for (auto _ : state)
     logger.post(s);
 }
@@ -49,49 +54,65 @@ template <class T>
 static void string_literal(benchmark::State& state) {
   auto& logger = get_logger<T>();
   for (auto _ : state)
-    logger.post("benchmark\n");
+    logger.post("12345678901234567890\n");
 }
 
+constexpr int threads = 16;
 constexpr double seconds = 3.0;
 
 #ifdef logger
-BENCHMARK(string<logger>)->Threads(8)->MinTime(seconds);
-BENCHMARK(string_literal<logger>)->Threads(8)->MinTime(seconds);
+BENCHMARK(string<logger>)->Threads(threads)->MinTime(seconds);
+BENCHMARK(string_literal<logger>)->Threads(threads)->MinTime(seconds);
 #endif
 
 #ifdef logger_with_mutex
-BENCHMARK(string<logger_with_mutex>)->Threads(8)->MinTime(seconds);
-BENCHMARK(string_literal<logger_with_mutex>)->Threads(8)->MinTime(seconds);
+BENCHMARK(string<logger_with_mutex>)->Threads(threads)->MinTime(seconds);
+BENCHMARK(string_literal<logger_with_mutex>)->Threads(threads)->MinTime(seconds);
 #endif
 
 #ifdef logger_with_condition_variable
-BENCHMARK(string<logger_with_condition_variable>)->Threads(8)->MinTime(seconds);
-BENCHMARK(string_literal<logger_with_condition_variable>)->Threads(8)->MinTime(seconds);
+BENCHMARK(string<logger_with_condition_variable>)->Threads(threads)->MinTime(seconds);
+BENCHMARK(string_literal<logger_with_condition_variable>)->Threads(threads)->MinTime(seconds);
 #endif
 
 #ifdef logger_with_semaphore
-BENCHMARK(string<logger_with_semaphore>)->Threads(8)->MinTime(seconds);
-BENCHMARK(string_literal<logger_with_semaphore>)->Threads(8)->MinTime(seconds);
+BENCHMARK(string<logger_with_semaphore>)->Threads(threads)->MinTime(seconds);
+BENCHMARK(string_literal<logger_with_semaphore>)->Threads(threads)->MinTime(seconds);
 #endif
 
 #ifdef logger_with_atomic_wait
-BENCHMARK(string<logger_with_atomic_wait>)->Threads(8)->MinTime(seconds);
-BENCHMARK(string_literal<logger_with_atomic_wait>)->Threads(8)->MinTime(seconds);
+BENCHMARK(string<logger_with_atomic_wait>)->Threads(threads)->MinTime(seconds);
+BENCHMARK(string_literal<logger_with_atomic_wait>)->Threads(threads)->MinTime(seconds);
 #endif
 
 #ifdef logger_with_atomic_wait_and_malloc
-BENCHMARK(string<logger_with_atomic_wait_and_malloc>)->Threads(8)->MinTime(seconds);
-BENCHMARK(string_literal<logger_with_atomic_wait_and_malloc>)->Threads(8)->MinTime(seconds);
+BENCHMARK(string<logger_with_atomic_wait_and_malloc>)->Threads(threads)->MinTime(seconds);
+BENCHMARK(string_literal<logger_with_atomic_wait_and_malloc>)->Threads(threads)->MinTime(seconds);
 #endif
 
 #ifdef logger_with_coroutines
-BENCHMARK(string<logger_with_coroutines>)->Threads(8)->MinTime(seconds);
-BENCHMARK(string_literal<logger_with_coroutines>)->Threads(8)->MinTime(seconds);
+BENCHMARK(string<logger_with_coroutines>)->Threads(threads)->MinTime(seconds);
+BENCHMARK(string_literal<logger_with_coroutines>)->Threads(threads)->MinTime(seconds);
 #endif
 
 #ifdef logger_with_coroutines_fast
-BENCHMARK(string<logger_with_coroutines_fast>)->Threads(8)->MinTime(seconds);
-BENCHMARK(string_literal<logger_with_coroutines_fast>)->Threads(8)->MinTime(seconds);
+BENCHMARK(string<logger_with_coroutines_fast>)->Threads(threads)->MinTime(seconds);
+BENCHMARK(string_literal<logger_with_coroutines_fast>)->Threads(threads)->MinTime(seconds);
+#endif
+
+#ifdef logger_with_boost_lockfree_queue
+BENCHMARK(string<logger_with_boost_lockfree_queue>)->Threads(threads)->MinTime(seconds);
+BENCHMARK(string_literal<logger_with_boost_lockfree_queue>)->Threads(threads)->MinTime(seconds);
+#endif
+
+#ifdef logger_with_boost_asio
+BENCHMARK(string<logger_with_boost_asio>)->Threads(threads)->MinTime(seconds);
+BENCHMARK(string_literal<logger_with_boost_asio>)->Threads(threads)->MinTime(seconds);
+#endif
+
+#ifdef logger_with_tbb
+BENCHMARK(string<logger_with_tbb>)->Threads(threads)->MinTime(seconds);
+BENCHMARK(string_literal<logger_with_tbb>)->Threads(threads)->MinTime(seconds);
 #endif
 
 template <class T>
@@ -149,35 +170,44 @@ int main(int argc, char** argv) {
   if (benchmark::ReportUnrecognizedArguments(argc, argv))
     return EXIT_FAILURE;
 
-  std::list<std::jthread> threads;
+  std::list<std::jthread> logger_threads;
 #ifdef logger
-  threads.emplace_back(create_logger<logger>());
+  logger_threads.emplace_back(create_logger<logger>());
 #endif
 #ifdef logger_with_mutex
-  threads.emplace_back(create_logger<logger_with_mutex>());
+  logger_threads.emplace_back(create_logger<logger_with_mutex>());
 #endif
 #ifdef logger_with_condition_variable
-  threads.emplace_back(create_logger<logger_with_condition_variable>());
+  logger_threads.emplace_back(create_logger<logger_with_condition_variable>());
 #endif
 #ifdef logger_with_semaphore
-  threads.emplace_back(create_logger<logger_with_semaphore>());
+  logger_threads.emplace_back(create_logger<logger_with_semaphore>());
 #endif
 #ifdef logger_with_atomic_wait
-  threads.emplace_back(create_logger<logger_with_atomic_wait>());
+  logger_threads.emplace_back(create_logger<logger_with_atomic_wait>());
 #endif
 #ifdef logger_with_atomic_wait_and_malloc
-  threads.emplace_back(create_logger<logger_with_atomic_wait_and_malloc>());
+  logger_threads.emplace_back(create_logger<logger_with_atomic_wait_and_malloc>());
 #endif
 #ifdef logger_with_coroutines
-  threads.emplace_back(create_logger<logger_with_coroutines>());
+  logger_threads.emplace_back(create_logger<logger_with_coroutines>());
 #endif
 #ifdef logger_with_coroutines_fast
-  threads.emplace_back(create_logger<logger_with_coroutines_fast>());
+  logger_threads.emplace_back(create_logger<logger_with_coroutines_fast>());
+#endif
+#ifdef logger_with_boost_lockfree_queue
+  logger_threads.emplace_back(create_logger<logger_with_boost_lockfree_queue>());
+#endif
+#ifdef logger_with_boost_asio
+  logger_threads.emplace_back(create_logger<logger_with_boost_asio>());
+#endif
+#ifdef logger_with_tbb
+  logger_threads.emplace_back(create_logger<logger_with_tbb>());
 #endif
 
   reporter reporter;
   benchmark::RunSpecifiedBenchmarks(&reporter);
-  for (auto& thread : threads) {
+  for (auto& thread : logger_threads) {
     thread.request_stop();
     thread.join();
   }

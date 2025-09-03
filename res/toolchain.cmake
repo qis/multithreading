@@ -25,6 +25,7 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
   cmake_path(CONVERT "${VS_ROOT}" TO_CMAKE_PATH_LIST VS_ROOT NORMALIZE)
 
   find_program(VCPKG NAMES vcpkg PATHS "${VS_ROOT}/VC/vcpkg")
+  set(VCPKG_TARGET_TRIPLET "x64-windows-static")
 elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
   find_program(VCPKG NAMES vcpkg PATHS /opt/vcpkg)
   set(VCPKG_TARGET_TRIPLET "x64-linux")
@@ -38,7 +39,6 @@ if(VCPKG)
   set(VCPKG_INSTALL_OPTIONS "--x-no-default-features")
   set(VCPKG_INSTALL_OPTIONS "${VCPKG_INSTALL_OPTIONS};--clean-buildtrees-after-build")
   set(VCPKG_INSTALL_OPTIONS "${VCPKG_INSTALL_OPTIONS};--clean-packages-after-build")
-  set(VCPKG_INSTALL_OPTIONS "${VCPKG_INSTALL_OPTIONS};--no-print-usage")
 
   if(NOT DEFINED ENV{VCPKG_DOWNLOADS})
     set(ENV{VCPKG_DOWNLOADS} "${CMAKE_SOURCE_DIR}/.cache/vcpkg/downloads")
@@ -59,6 +59,8 @@ if(VCPKG)
     get_filename_component(TOOLCHAIN_DLL_NAME "${TOOLCHAIN_DLL}" NAME)
     configure_file(${TOOLCHAIN_DLL} "${CMAKE_BINARY_DIR}/bin/${TOOLCHAIN_DLL_NAME}" COPYONLY)
   endforeach()
+
+  set(VCPKG_FOUND ON CACHE BOOL "")
 endif()
 
 # Debug

@@ -15,12 +15,28 @@ if(WIN32)
   target_compile_definitions(logger PUBLIC NOMINMAX WIN32_LEAN_AND_MEAN)
 endif()
 
+if(VCPKG_FOUND)
+  # Requires "boost-asio" and "boost-lockfree" in vcpkg.json dependencies.
+  find_package(Boost CONFIG COMPONENTS asio lockfree)
+  if(Boost_FOUND)
+    target_link_libraries(logger PUBLIC ${Boost_LIBRARIES})
+    target_compile_definitions(logger PUBLIC LOGGER_USE_BOOST)
+  endif()
+
+  # Requires { "name": "tbb", "default-features": false } in vcpkg.json dependencies.
+  find_package(TBB CONFIG)
+  if(TBB_FOUND)
+    target_link_libraries(logger PUBLIC TBB::tbb)
+    target_compile_definitions(logger PUBLIC LOGGER_USE_TBB)
+  endif()
+endif()
+
 add_executable(multithreading src/main.cpp src/main.manifest)
 target_precompile_headers(multithreading REUSE_FROM logger)
 target_link_libraries(multithreading PRIVATE logger)
 
-find_package(benchmark CONFIG)
-if(TARGET benchmark::benchmark)
+if(VCPKG_FOUND)
+  find_package(benchmark CONFIG REQUIRED)
   add_executable(benchmarks src/benchmarks.cpp src/main.manifest)
   target_precompile_headers(benchmarks REUSE_FROM logger)
   target_link_libraries(benchmarks PRIVATE logger benchmark::benchmark)

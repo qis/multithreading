@@ -9,12 +9,12 @@
 // Language Support
 #include <cfloat>
 #include <climits>
+#include <compare>           // C++20
 #include <csetjmp>
 #include <csignal>
 #include <cstdarg>
 #include <cstddef>
 #include <cstdint>           // C++11
-#include <compare>           // C++20
 #if __has_include(<contracts>)
 #include <contracts>         // C++26
 #endif
@@ -109,11 +109,11 @@
 
 // Text Processing
 #include <cctype>
+#include <charconv>       // C++17
 #include <clocale>
 #include <cuchar>         // C++11
 #include <cwchar>
 #include <cwctype>
-#include <charconv>       // C++17
 #include <format>         // C++20
 #include <locale>
 #include <regex>          // C++11
@@ -136,8 +136,8 @@
 #include <valarray>
 
 // Time
-#include <ctime>
 #include <chrono>  // C++11
+#include <ctime>
 
 // Input/Output
 #include <cinttypes>   // C++11
