@@ -13,6 +13,7 @@ target_include_directories(logger PUBLIC src)
 
 if(WIN32)
   target_compile_definitions(logger PUBLIC NOMINMAX WIN32_LEAN_AND_MEAN)
+  target_compile_definitions(logger PUBLIC WINVER=0x0601 _WIN32_WINNT=0x0601 NTDDI_VERSION=0x06010000)
 endif()
 
 if(VCPKG_FOUND)
@@ -20,7 +21,13 @@ if(VCPKG_FOUND)
   find_package(Boost CONFIG COMPONENTS asio lockfree)
   if(Boost_FOUND)
     target_link_libraries(logger PUBLIC ${Boost_LIBRARIES})
-    target_compile_definitions(logger PUBLIC LOGGER_USE_BOOST)
+    target_compile_definitions(logger PUBLIC BOOST_USE_WINDOWS_H)
+    if(boost_asio_FOUND)
+      target_compile_definitions(logger PUBLIC LOGGER_USE_BOOST_ASIO)
+    endif()
+    if(boost_lockfree_FOUND)
+      target_compile_definitions(logger PUBLIC LOGGER_USE_BOOST_LOCKFREE)
+    endif()
   endif()
 
   # Requires { "name": "tbb", "default-features": false } in vcpkg.json dependencies.

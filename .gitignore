@@ -13,5 +13,4 @@ RC*
 !/CMakeLists.txt
 !/CMakePresets.json
 !/readme.md
-!/vcpkg-configuration.json
 !/vcpkg.json
