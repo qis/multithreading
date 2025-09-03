@@ -1,28 +1,35 @@
 // min_time:3.000/threads:16
-// Run on (16 X 2357.91 MHz CPU s)
+// Run on (16 X 2904 MHz CPU s)
 // CPU Caches:
 //   L1 Data 32 KiB (x8)
 //   L1 Instruction 32 KiB (x8)
-//   L2 Unified 512 KiB (x8)
+//   L2 Unified 256 KiB (x8)
 //   L3 Unified 16384 KiB (x1)
-// Load Average: 1.07, 1.00, 0.61
 // -------------------------------------------------------------------------------------------------
 // Benchmark                                                       Time             CPU   Iterations
 // -------------------------------------------------------------------------------------------------
-// string<logger_with_mutex>                                    4777 ns         2717 ns      2153040
-// string_literal<logger_with_mutex>                            4683 ns         2591 ns      1618288
-// string<logger_with_condition_variable>                       2848 ns         1001 ns      4217616
-// string_literal<logger_with_condition_variable>               2845 ns         1002 ns      4203792
-// string<logger_with_semaphore>                                2845 ns          982 ns      4224960
-// string_literal<logger_with_semaphore>                        2839 ns          977 ns      4314304
-// string<logger_with_atomic_wait>                              2867 ns          994 ns      4208896
-// string_literal<logger_with_atomic_wait>                      2849 ns          983 ns      4269856
-// string<logger_with_atomic_wait_and_malloc>                   1653 ns          412 ns     10171040
-// string_literal<logger_with_atomic_wait_and_malloc>           1747 ns          426 ns     10266176
-// string<logger_with_coroutines>                               4930 ns         1713 ns      2475920
-// string_literal<logger_with_coroutines>                       3265 ns         1178 ns      3582896
-// string<logger_with_coroutines_fast>                          3336 ns         1223 ns      3422688
-// string_literal<logger_with_coroutines_fast>                  1854 ns          514 ns      8178960
+// string<logger_with_mutex>                                   12957 ns         6098 ns       955728
+// string_literal<logger_with_mutex>                           11969 ns         4984 ns       843296
+// string<logger_with_condition_variable>                       1009 ns          944 ns      3874592
+// string_literal<logger_with_condition_variable>                986 ns          961 ns      4258224
+// string<logger_with_semaphore>                                1276 ns         1078 ns      3739824
+// string_literal<logger_with_semaphore>                        1243 ns         1091 ns      3909824
+// string<logger_with_atomic_wait>                              1071 ns          946 ns      4575312
+// string_literal<logger_with_atomic_wait>                      1042 ns          876 ns      4674784
+// string<logger_with_atomic_wait_and_malloc>                   1023 ns          815 ns      5120000
+// string_literal<logger_with_atomic_wait_and_malloc>           1033 ns          862 ns      4674784
+// string<logger_with_coroutines>                               1036 ns          765 ns      4943456
+// string_literal<logger_with_coroutines>                       1043 ns          799 ns      4887280
+// string<logger_with_coroutines_fast>                          1010 ns          821 ns      5059760
+// string_literal<logger_with_coroutines_fast>                   935 ns          800 ns      5000928
+// string<logger_with_boost_lockfree_queue>                     2029 ns         1606 ns      2150400
+// string_literal<logger_with_boost_lockfree_queue>             2059 ns         1678 ns      2606544
+// string<logger_with_boost_asio>                               3339 ns         2423 ns      1592896
+// string_literal<logger_with_boost_asio>                       3396 ns         2393 ns      1403824
+// string<logger_with_tbb_queue>                                2174 ns          888 ns      4344240
+// string_literal<logger_with_tbb_queue>                        2218 ns          895 ns      3525248
+// string<logger_with_tbb_bounded_queue>                      174394 ns         2344 ns       160000
+// string_literal<logger_with_tbb_bounded_queue>              175004 ns         1660 ns       160000
 
 #include "logger.hpp"
 #include <benchmark/benchmark.h>
@@ -110,9 +117,14 @@ BENCHMARK(string<logger_with_boost_asio>)->Threads(threads)->MinTime(seconds);
 BENCHMARK(string_literal<logger_with_boost_asio>)->Threads(threads)->MinTime(seconds);
 #endif
 
-#ifdef logger_with_tbb
-BENCHMARK(string<logger_with_tbb>)->Threads(threads)->MinTime(seconds);
-BENCHMARK(string_literal<logger_with_tbb>)->Threads(threads)->MinTime(seconds);
+#ifdef logger_with_tbb_queue
+BENCHMARK(string<logger_with_tbb_queue>)->Threads(threads)->MinTime(seconds);
+BENCHMARK(string_literal<logger_with_tbb_queue>)->Threads(threads)->MinTime(seconds);
+#endif
+
+#ifdef logger_with_tbb_bounded_queue
+BENCHMARK(string<logger_with_tbb_bounded_queue>)->Threads(threads)->MinTime(seconds);
+BENCHMARK(string_literal<logger_with_tbb_bounded_queue>)->Threads(threads)->MinTime(seconds);
 #endif
 
 template <class T>
@@ -201,8 +213,11 @@ int main(int argc, char** argv) {
 #ifdef logger_with_boost_asio
   logger_threads.emplace_back(create_logger<logger_with_boost_asio>());
 #endif
-#ifdef logger_with_tbb
-  logger_threads.emplace_back(create_logger<logger_with_tbb>());
+#ifdef logger_with_tbb_queue
+  logger_threads.emplace_back(create_logger<logger_with_tbb_queue>());
+#endif
+#ifdef logger_with_tbb_bounded_queue
+  logger_threads.emplace_back(create_logger<logger_with_tbb_bounded_queue>());
 #endif
 
   reporter reporter;

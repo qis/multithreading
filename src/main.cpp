@@ -2,8 +2,8 @@
 
 int main() {
   try {
-#ifdef logger_with_tbb
-    logger_with_tbb logger;
+#ifdef logger_with_tbb_bounded_queue
+    logger_with_tbb_bounded_queue logger;
 #else
     logger logger;
 #endif
