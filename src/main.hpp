@@ -174,4 +174,23 @@
 #include <stop_token>          // C++20
 #include <thread>              // C++11
 
+#ifdef LOGGER_USE_BOOST_ASIO
+#include <boost/asio/executor_work_guard.hpp>
+#include <boost/asio/io_context.hpp>
+#include <boost/asio/post.hpp>
+#endif
+
+#ifdef LOGGER_USE_BOOST_LOCKFREE
+#include <boost/lockfree/queue.hpp>
+#endif
+
+#ifdef LOGGER_USE_SPDLOG
+#include <spdlog/spdlog.h>
+#endif
+
+#ifdef LOGGER_USE_TBB
+#include <tbb/concurrent_queue.h>
+#include <tbb/scalable_allocator.h>
+#endif
+
 using namespace std::literals;

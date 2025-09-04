@@ -30,10 +30,17 @@ if(VCPKG_FOUND)
     endif()
   endif()
 
+  # Requires "spdlog" in vcpkg.json dependencies.
+  find_package(spdlog CONFIG)
+  if(spdlog_FOUND)
+    target_link_libraries(logger PUBLIC spdlog::spdlog)
+    target_compile_definitions(logger PUBLIC LOGGER_USE_SPDLOG)
+  endif()
+
   # Requires { "name": "tbb", "default-features": false } in vcpkg.json dependencies.
   find_package(TBB CONFIG)
   if(TBB_FOUND)
-    target_link_libraries(logger PUBLIC TBB::tbb)
+    target_link_libraries(logger PUBLIC TBB::tbb TBB::tbbmalloc)
     target_compile_definitions(logger PUBLIC LOGGER_USE_TBB)
   endif()
 endif()
