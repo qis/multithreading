@@ -2,8 +2,8 @@
 
 int main() {
   try {
-#ifdef logger_with_atomic_wait_and_malloc
-    logger_with_atomic_wait_and_malloc logger;
+#ifdef logger_with_test
+    logger_with_test logger;
 #else
     logger logger;
 #endif

@@ -1,40 +1,27 @@
-// iterations:100000/threads:16
-// Run on (16 X 2357.63 MHz CPU s)
+// =================================================================================================
+// Linux
+// =================================================================================================
+// Run on (16 X 400 MHz CPU s)
 // CPU Caches:
 //   L1 Data 32 KiB (x8)
 //   L1 Instruction 32 KiB (x8)
 //   L2 Unified 512 KiB (x8)
 //   L3 Unified 16384 KiB (x1)
-// Load Average: 1.54, 1.13, 1.62
+// Load Average: 1.24, 1.36, 1.17
 // -------------------------------------------------------------------------------------------------
-// Benchmark                                                       Time             CPU   Iterations
+// Benchmark                                      Time             CPU
 // -------------------------------------------------------------------------------------------------
-// string<logger_with_mutex>                                    4538 ns         2347 ns      1600000
-// string_literal<logger_with_mutex>                            4522 ns         2473 ns      1600000
-// string<logger_with_condition_variable>                       2838 ns         1037 ns      1600000
-// string_literal<logger_with_condition_variable>               2830 ns         1007 ns      1600000
-// string<logger_with_semaphore>                                2846 ns          994 ns      1600000
-// string_literal<logger_with_semaphore>                        2801 ns         1006 ns      1600000
-// string<logger_with_atomic_wait>                              3154 ns         1654 ns      1600000
-// string_literal<logger_with_atomic_wait>                      3188 ns         1654 ns      1600000
-// string<logger_with_atomic_wait_and_malloc>             [!]   1567 ns          405 ns      1600000
-// string_literal<logger_with_atomic_wait_and_malloc>     [!]   1569 ns          375 ns      1600000
-// string<logger_with_coroutines>                               4691 ns         2191 ns      1600000
-// string_literal<logger_with_coroutines>                       3188 ns         1627 ns      1600000
-// string<logger_with_coroutines_fast>                          3085 ns         1666 ns      1600000
-// string_literal<logger_with_coroutines_fast>                  1861 ns          981 ns      1600000
-// string<logger_with_boost_lockfree_queue>                     4959 ns         4365 ns      1600000
-// string_literal<logger_with_boost_lockfree_queue>             4888 ns         4461 ns      1600000
-// string<logger_with_boost_asio>                               5113 ns         3438 ns      1600000
-// string_literal<logger_with_boost_asio>                       4083 ns         2839 ns      1600000
-// string<logger_with_tbb_queue>                                3746 ns         2660 ns      1600000
-// string_literal<logger_with_tbb_queue>                        2903 ns         2163 ns      1600000
-// string<logger_with_tbb_bounded_queue>                       19196 ns         2375 ns      1600000
-// string_literal<logger_with_tbb_bounded_queue>               17151 ns         2432 ns      1600000
-// string<logger_with_tbb_scalable_allocator>                   1498 ns         1286 ns      1600000
-// string_literal<logger_with_tbb_scalable_allocator>           1585 ns         1379 ns      1600000
-// string<logger_with_spdlog>                                  14415 ns         3807 ns      1600000
-// string_literal<logger_with_spdlog>                          14450 ns         3814 ns      1600000
+// dynamic<logger_with_spdlog>                13039 ns         3440 ns
+// dynamic<logger_with_tbb_bounded_queue>     15088 ns         2362 ns
+// dynamic<logger_with_tbb_queue>              2166 ns          846 ns
+// dynamic<logger_with_boost_lockfree_queue>   5196 ns         4983 ns
+// dynamic<logger_with_boost_asio>             6519 ns         4771 ns
+// dynamic<logger_with_mutex>                  9087 ns         2381 ns
+// dynamic<logger_with_coroutines>             2902 ns         1028 ns
+// dynamic<logger_with_condition_variable>     1440 ns          376 ns
+// dynamic<logger_with_semaphore>              1496 ns          378 ns
+// dynamic<logger_with_atomic>                 1889 ns          920 ns
+// dynamic<logger_with_tbb_allocator>          1891 ns         1797 ns
 
 #include "logger.hpp"
 #include <benchmark/benchmark.h>
@@ -65,7 +52,7 @@ std::shared_ptr<Logger> get_logger() {
 static_assert(std::string{}.capacity() < 20);
 
 template <class T>
-static void string(benchmark::State& state) {
+static void dynamic(benchmark::State& state) {
   auto logger = get_logger<T>();
   const std::string s{"12345678901234567890\n"};
   for (auto _ : state)
@@ -73,7 +60,7 @@ static void string(benchmark::State& state) {
 }
 
 template <class T>
-static void string_literal(benchmark::State& state) {
+static void literal(benchmark::State& state) {
   auto logger = get_logger<T>();
   for (auto _ : state)
     logger->post("12345678901234567890\n");
@@ -83,73 +70,56 @@ constexpr int threads = 16;
 constexpr benchmark::IterationCount count = 100'000;
 
 #ifdef logger
-BENCHMARK(string<logger>)->Threads(threads)->Iterations(count);
-BENCHMARK(string_literal<logger>)->Threads(threads)->Iterations(count);
-#endif
-
-#ifdef logger_with_mutex
-BENCHMARK(string<logger_with_mutex>)->Threads(threads)->Iterations(count);
-BENCHMARK(string_literal<logger_with_mutex>)->Threads(threads)->Iterations(count);
-#endif
-
-#ifdef logger_with_condition_variable
-BENCHMARK(string<logger_with_condition_variable>)->Threads(threads)->Iterations(count);
-BENCHMARK(string_literal<logger_with_condition_variable>)->Threads(threads)->Iterations(count);
-#endif
-
-#ifdef logger_with_semaphore
-BENCHMARK(string<logger_with_semaphore>)->Threads(threads)->Iterations(count);
-BENCHMARK(string_literal<logger_with_semaphore>)->Threads(threads)->Iterations(count);
-#endif
-
-#ifdef logger_with_atomic_wait
-BENCHMARK(string<logger_with_atomic_wait>)->Threads(threads)->Iterations(count);
-BENCHMARK(string_literal<logger_with_atomic_wait>)->Threads(threads)->Iterations(count);
-#endif
-
-#ifdef logger_with_atomic_wait_and_malloc
-BENCHMARK(string<logger_with_atomic_wait_and_malloc>)->Threads(threads)->Iterations(count);
-BENCHMARK(string_literal<logger_with_atomic_wait_and_malloc>)->Threads(threads)->Iterations(count);
-#endif
-
-#ifdef logger_with_coroutines
-BENCHMARK(string<logger_with_coroutines>)->Threads(threads)->Iterations(count);
-BENCHMARK(string_literal<logger_with_coroutines>)->Threads(threads)->Iterations(count);
-#endif
-
-#ifdef logger_with_coroutines_fast
-BENCHMARK(string<logger_with_coroutines_fast>)->Threads(threads)->Iterations(count);
-BENCHMARK(string_literal<logger_with_coroutines_fast>)->Threads(threads)->Iterations(count);
-#endif
-
-#ifdef logger_with_boost_lockfree_queue
-BENCHMARK(string<logger_with_boost_lockfree_queue>)->Threads(threads)->Iterations(count);
-BENCHMARK(string_literal<logger_with_boost_lockfree_queue>)->Threads(threads)->Iterations(count);
-#endif
-
-#ifdef logger_with_boost_asio
-BENCHMARK(string<logger_with_boost_asio>)->Threads(threads)->Iterations(count);
-BENCHMARK(string_literal<logger_with_boost_asio>)->Threads(threads)->Iterations(count);
-#endif
-
-#ifdef logger_with_tbb_queue
-BENCHMARK(string<logger_with_tbb_queue>)->Threads(threads)->Iterations(count);
-BENCHMARK(string_literal<logger_with_tbb_queue>)->Threads(threads)->Iterations(count);
-#endif
-
-#ifdef logger_with_tbb_bounded_queue
-BENCHMARK(string<logger_with_tbb_bounded_queue>)->Threads(threads)->Iterations(count);
-BENCHMARK(string_literal<logger_with_tbb_bounded_queue>)->Threads(threads)->Iterations(count);
-#endif
-
-#ifdef logger_with_tbb_scalable_allocator
-BENCHMARK(string<logger_with_tbb_scalable_allocator>)->Threads(threads)->Iterations(count);
-BENCHMARK(string_literal<logger_with_tbb_scalable_allocator>)->Threads(threads)->Iterations(count);
+BENCHMARK(dynamic<logger>)->Threads(threads)->Iterations(count);
+BENCHMARK(literal<logger>)->Threads(threads)->Iterations(count);
 #endif
 
 #ifdef logger_with_spdlog
-BENCHMARK(string<logger_with_spdlog>)->Threads(threads)->Iterations(count);
-BENCHMARK(string_literal<logger_with_spdlog>)->Threads(threads)->Iterations(count);
+BENCHMARK(dynamic<logger_with_spdlog>)->Threads(threads)->Iterations(count);
+#endif
+
+#ifdef logger_with_tbb_bounded_queue
+BENCHMARK(dynamic<logger_with_tbb_bounded_queue>)->Threads(threads)->Iterations(count);
+#endif
+
+#ifdef logger_with_tbb_queue
+BENCHMARK(dynamic<logger_with_tbb_queue>)->Threads(threads)->Iterations(count);
+#endif
+
+#ifdef logger_with_boost_lockfree_queue
+BENCHMARK(dynamic<logger_with_boost_lockfree_queue>)->Threads(threads)->Iterations(count);
+#endif
+
+#ifdef logger_with_boost_asio
+BENCHMARK(dynamic<logger_with_boost_asio>)->Threads(threads)->Iterations(count);
+#endif
+
+#ifdef logger_with_mutex
+BENCHMARK(dynamic<logger_with_mutex>)->Threads(threads)->Iterations(count);
+#endif
+
+#ifdef logger_with_coroutines
+BENCHMARK(dynamic<logger_with_coroutines>)->Threads(threads)->Iterations(count);
+#endif
+
+#ifdef logger_with_condition_variable
+BENCHMARK(dynamic<logger_with_condition_variable>)->Threads(threads)->Iterations(count);
+#endif
+
+#ifdef logger_with_semaphore
+BENCHMARK(dynamic<logger_with_semaphore>)->Threads(threads)->Iterations(count);
+#endif
+
+#ifdef logger_with_atomic
+BENCHMARK(dynamic<logger_with_atomic>)->Threads(threads)->Iterations(count);
+#endif
+
+#ifdef logger_with_tbb_allocator
+BENCHMARK(dynamic<logger_with_tbb_allocator>)->Threads(threads)->Iterations(count);
+#endif
+
+#ifdef logger_with_test
+BENCHMARK(dynamic<logger_with_test>)->Threads(threads)->Iterations(count);
 #endif
 
 template <class T>
@@ -211,26 +181,11 @@ int main(int argc, char** argv) {
 #ifdef logger
   logger_threads.emplace_back(create_logger<logger>());
 #endif
-#ifdef logger_with_mutex
-  logger_threads.emplace_back(create_logger<logger_with_mutex>());
+#ifdef logger_with_tbb_bounded_queue
+  logger_threads.emplace_back(create_logger<logger_with_tbb_bounded_queue>());
 #endif
-#ifdef logger_with_condition_variable
-  logger_threads.emplace_back(create_logger<logger_with_condition_variable>());
-#endif
-#ifdef logger_with_semaphore
-  logger_threads.emplace_back(create_logger<logger_with_semaphore>());
-#endif
-#ifdef logger_with_atomic_wait
-  logger_threads.emplace_back(create_logger<logger_with_atomic_wait>());
-#endif
-#ifdef logger_with_atomic_wait_and_malloc
-  logger_threads.emplace_back(create_logger<logger_with_atomic_wait_and_malloc>());
-#endif
-#ifdef logger_with_coroutines
-  logger_threads.emplace_back(create_logger<logger_with_coroutines>());
-#endif
-#ifdef logger_with_coroutines_fast
-  logger_threads.emplace_back(create_logger<logger_with_coroutines_fast>());
+#ifdef logger_with_tbb_queue
+  logger_threads.emplace_back(create_logger<logger_with_tbb_queue>());
 #endif
 #ifdef logger_with_boost_lockfree_queue
   logger_threads.emplace_back(create_logger<logger_with_boost_lockfree_queue>());
@@ -238,14 +193,26 @@ int main(int argc, char** argv) {
 #ifdef logger_with_boost_asio
   logger_threads.emplace_back(create_logger<logger_with_boost_asio>());
 #endif
-#ifdef logger_with_tbb_queue
-  logger_threads.emplace_back(create_logger<logger_with_tbb_queue>());
+#ifdef logger_with_mutex
+  logger_threads.emplace_back(create_logger<logger_with_mutex>());
 #endif
-#ifdef logger_with_tbb_bounded_queue
-  logger_threads.emplace_back(create_logger<logger_with_tbb_bounded_queue>());
+#ifdef logger_with_coroutines
+  logger_threads.emplace_back(create_logger<logger_with_coroutines>());
 #endif
-#ifdef logger_with_tbb_scalable_allocator
-  logger_threads.emplace_back(create_logger<logger_with_tbb_scalable_allocator>());
+#ifdef logger_with_condition_variable
+  logger_threads.emplace_back(create_logger<logger_with_condition_variable>());
+#endif
+#ifdef logger_with_semaphore
+  logger_threads.emplace_back(create_logger<logger_with_semaphore>());
+#endif
+#ifdef logger_with_atomic
+  logger_threads.emplace_back(create_logger<logger_with_atomic>());
+#endif
+#ifdef logger_with_tbb_allocator
+  logger_threads.emplace_back(create_logger<logger_with_tbb_allocator>());
+#endif
+#ifdef logger_with_test
+  logger_threads.emplace_back(create_logger<logger_with_test>());
 #endif
 
   reporter reporter;

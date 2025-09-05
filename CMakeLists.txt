@@ -30,6 +30,15 @@ if(VCPKG_FOUND)
     endif()
   endif()
 
+  # Requires "liburing" in vcpkg.json dependencies.
+  find_path(LIBURING_INCLUDE_DIR NAMES liburing.h)
+  find_library(LIBURING_LIBRARY NAMES uring liburing)
+  if (LIBURING_INCLUDE_DIR AND LIBURING_LIBRARY)
+    target_include_directories(logger PUBLIC ${LIBURING_INCLUDE_DIR})
+    target_link_libraries(logger PUBLIC ${LIBURING_LIBRARY})
+    target_compile_definitions(logger PUBLIC LOGGER_USE_LIBURING)
+  endif()
+
   # Requires "spdlog" in vcpkg.json dependencies.
   find_package(spdlog CONFIG)
   if(spdlog_FOUND)
