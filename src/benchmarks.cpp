@@ -1,15 +1,16 @@
 // =================================================================================================
-// Linux
+// Benchmark
 // =================================================================================================
-// Run on (16 X 400 MHz CPU s)
+// Threads: 16, Iterations: 1'600'000 (Total)
+// CPU: AMD Ryzen 7 PRO 6850U (16 × 2695 MHz)
 // CPU Caches:
 //   L1 Data 32 KiB (x8)
 //   L1 Instruction 32 KiB (x8)
 //   L2 Unified 512 KiB (x8)
 //   L3 Unified 16384 KiB (x1)
-// Load Average: 1.24, 1.36, 1.17
+//
 // -------------------------------------------------------------------------------------------------
-// Benchmark                                      Time             CPU
+// Linux                                          Time             CPU
 // -------------------------------------------------------------------------------------------------
 // dynamic<logger_with_spdlog>                13039 ns         3440 ns
 // dynamic<logger_with_tbb_bounded_queue>     15088 ns         2362 ns
@@ -22,6 +23,21 @@
 // dynamic<logger_with_semaphore>              1496 ns          378 ns
 // dynamic<logger_with_atomic>                 1889 ns          920 ns
 // dynamic<logger_with_tbb_allocator>          1891 ns         1797 ns
+//
+// -------------------------------------------------------------------------------------------------
+// Windows                                        Time             CPU
+// -------------------------------------------------------------------------------------------------
+// dynamic<logger_with_spdlog>                47186 ns         1855 ns
+// dynamic<logger_with_tbb_bounded_queue>     42990 ns          801 ns
+// dynamic<logger_with_tbb_queue>              1751 ns         1475 ns
+// dynamic<logger_with_boost_lockfree_queue>   5919 ns         5303 ns
+// dynamic<logger_with_boost_asio>             6979 ns         5879 ns
+// dynamic<logger_with_mutex>                 17154 ns          283 ns
+// dynamic<logger_with_coroutines>             1131 ns          664 ns
+// dynamic<logger_with_condition_variable>      957 ns          811 ns
+// dynamic<logger_with_semaphore>               863 ns          645 ns
+// dynamic<logger_with_atomic>                  787 ns          586 ns
+// dynamic<logger_with_tbb_allocator>           614 ns          283 ns
 
 #include "logger.hpp"
 #include <benchmark/benchmark.h>
