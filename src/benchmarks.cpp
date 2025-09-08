@@ -2,7 +2,7 @@
 // Benchmark
 // =================================================================================================
 // Threads: 16, Iterations: 1'600'000 (Total)
-// CPU: AMD Ryzen 7 PRO 6850U (16 × 4688.47 MHz)
+// CPU: AMD Ryzen 7 PRO 6850U (16 Cores)
 // CPU Caches:
 //   L1 Data 32 KiB (x8)
 //   L1 Instruction 32 KiB (x8)
@@ -29,17 +29,19 @@
 // -------------------------------------------------------------------------------------------------
 // Windows                                        Time             CPU
 // -------------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
+// literal<logger>                              247 ns          137 ns
+// dynamic<logger>                              246 ns          137 ns
+// dynamic<logger_with_spdlog>                51124 ns         1426 ns
+// dynamic<logger_with_tbb_bounded_queue>     49653 ns          508 ns
+// dynamic<logger_with_tbb_queue>              2211 ns         1816 ns
+// dynamic<logger_with_boost_lockfree_queue>   5669 ns         4766 ns
+// dynamic<logger_with_boost_asio>             6548 ns         5342 ns
+// dynamic<logger_with_mutex>                 21222 ns          537 ns
+// dynamic<logger_with_coroutines>             1320 ns          537 ns
+// dynamic<logger_with_condition_variable>      961 ns          742 ns
+// dynamic<logger_with_semaphore>              1056 ns          791 ns
+// dynamic<logger_with_atomic>                 1012 ns          723 ns
+// dynamic<logger_with_tbb_allocator>           850 ns          596 ns
 
 #include "logger.hpp"
 #include <benchmark/benchmark.h>
