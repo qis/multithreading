@@ -2,7 +2,7 @@
 // Benchmark
 // =================================================================================================
 // Threads: 16, Iterations: 1'600'000 (Total)
-// CPU: AMD Ryzen 7 PRO 6850U (16 × 2695 MHz)
+// CPU: AMD Ryzen 7 PRO 6850U (16 × 4688.47 MHz)
 // CPU Caches:
 //   L1 Data 32 KiB (x8)
 //   L1 Instruction 32 KiB (x8)
@@ -12,32 +12,34 @@
 // -------------------------------------------------------------------------------------------------
 // Linux                                          Time             CPU
 // -------------------------------------------------------------------------------------------------
-// dynamic<logger_with_spdlog>                13039 ns         3440 ns
-// dynamic<logger_with_tbb_bounded_queue>     15088 ns         2362 ns
-// dynamic<logger_with_tbb_queue>              2166 ns          846 ns
-// dynamic<logger_with_boost_lockfree_queue>   5196 ns         4983 ns
-// dynamic<logger_with_boost_asio>             6519 ns         4771 ns
-// dynamic<logger_with_mutex>                  9087 ns         2381 ns
-// dynamic<logger_with_coroutines>             2902 ns         1028 ns
-// dynamic<logger_with_condition_variable>     1440 ns          376 ns
-// dynamic<logger_with_semaphore>              1496 ns          378 ns
-// dynamic<logger_with_atomic>                 1889 ns          920 ns
-// dynamic<logger_with_tbb_allocator>          1891 ns         1797 ns
+// literal<logger>                              326 ns          253 ns
+// dynamic<logger>                              291 ns          239 ns
+// dynamic<logger_with_spdlog>                18848 ns         1971 ns
+// dynamic<logger_with_tbb_bounded_queue>     33399 ns         2396 ns
+// dynamic<logger_with_tbb_queue>              3967 ns         2794 ns
+// dynamic<logger_with_boost_lockfree_queue>   8375 ns         5087 ns
+// dynamic<logger_with_boost_asio>             7829 ns         4808 ns
+// dynamic<logger_with_mutex>                 11033 ns          662 ns
+// dynamic<logger_with_coroutines>             9231 ns         5564 ns
+// dynamic<logger_with_condition_variable>     3417 ns         1574 ns
+// dynamic<logger_with_semaphore>              3502 ns         2076 ns
+// dynamic<logger_with_atomic>                 3228 ns         1901 ns
+// dynamic<logger_with_tbb_allocator>          1680 ns         1580 ns
 //
 // -------------------------------------------------------------------------------------------------
 // Windows                                        Time             CPU
 // -------------------------------------------------------------------------------------------------
-// dynamic<logger_with_spdlog>                47186 ns         1855 ns
-// dynamic<logger_with_tbb_bounded_queue>     42990 ns          801 ns
-// dynamic<logger_with_tbb_queue>              1751 ns         1475 ns
-// dynamic<logger_with_boost_lockfree_queue>   5919 ns         5303 ns
-// dynamic<logger_with_boost_asio>             6979 ns         5879 ns
-// dynamic<logger_with_mutex>                 17154 ns          283 ns
-// dynamic<logger_with_coroutines>             1131 ns          664 ns
-// dynamic<logger_with_condition_variable>      957 ns          811 ns
-// dynamic<logger_with_semaphore>               863 ns          645 ns
-// dynamic<logger_with_atomic>                  787 ns          586 ns
-// dynamic<logger_with_tbb_allocator>           614 ns          283 ns
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 #include "logger.hpp"
 #include <benchmark/benchmark.h>
@@ -86,8 +88,8 @@ constexpr int threads = 16;
 constexpr benchmark::IterationCount count = 100'000;
 
 #ifdef logger
-BENCHMARK(dynamic<logger>)->Threads(threads)->Iterations(count);
 BENCHMARK(literal<logger>)->Threads(threads)->Iterations(count);
+BENCHMARK(dynamic<logger>)->Threads(threads)->Iterations(count);
 #endif
 
 #ifdef logger_with_spdlog
@@ -132,10 +134,6 @@ BENCHMARK(dynamic<logger_with_atomic>)->Threads(threads)->Iterations(count);
 
 #ifdef logger_with_tbb_allocator
 BENCHMARK(dynamic<logger_with_tbb_allocator>)->Threads(threads)->Iterations(count);
-#endif
-
-#ifdef logger_with_test
-BENCHMARK(dynamic<logger_with_test>)->Threads(threads)->Iterations(count);
 #endif
 
 template <class T>
@@ -226,9 +224,6 @@ int main(int argc, char** argv) {
 #endif
 #ifdef logger_with_tbb_allocator
   logger_threads.emplace_back(create_logger<logger_with_tbb_allocator>());
-#endif
-#ifdef logger_with_test
-  logger_threads.emplace_back(create_logger<logger_with_test>());
 #endif
 
   reporter reporter;
