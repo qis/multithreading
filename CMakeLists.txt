@@ -3,17 +3,11 @@ project(multithreading DESCRIPTION "Multithreading" VERSION 0.1.0 LANGUAGES CXX)
 
 # Logger
 add_library(logger STATIC src/logger.cpp src/logger.hpp)
-if(MSVC AND NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-  target_compile_options(logger PUBLIC /std:c++latest)
-else()
-  target_compile_features(logger PUBLIC cxx_std_26)
-endif()
 target_precompile_headers(logger PRIVATE src/main.hpp)
 target_include_directories(logger PUBLIC src)
 
 if(WIN32)
   target_compile_definitions(logger PUBLIC NOMINMAX WIN32_LEAN_AND_MEAN)
-  target_compile_definitions(logger PUBLIC WINVER=0x0601 _WIN32_WINNT=0x0601 NTDDI_VERSION=0x06010000)
 endif()
 
 if(VCPKG_FOUND)

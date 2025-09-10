@@ -1,7 +1,6 @@
 # clangd 19
 ---
 CompileFlags:
-  Add: [ -xc++, -std=c++26 ]
   CompilationDatabase: build
 Diagnostics:
   ClangTidy:

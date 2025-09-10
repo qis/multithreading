@@ -1,0 +1,38 @@
+# Toolchain
+include_guard(GLOBAL)
+
+# System
+set(CMAKE_SYSTEM_NAME "@CMAKE_SYSTEM_NAME@" CACHE STRING "")
+set(CMAKE_SYSTEM_VERSION "@CMAKE_SYSTEM_VERSION@" CACHE STRING "")
+set(CMAKE_SYSTEM_PROCESSOR "@CMAKE_SYSTEM_PROCESSOR@" CACHE STRING "")
+
+# System Program Path
+list(PREPEND CMAKE_SYSTEM_PROGRAM_PATH
+  "@NINJA_BIN@"
+  "@RUNTIME_BIN@"
+  "@LLVM_BIN@"
+  "@SDK_BIN@")
+
+# Include Directories
+include_directories(BEFORE SYSTEM
+  "@RUNTIME_INCLUDE@"
+  "@SDK_INCLUDE_UCRT@"
+  "@SDK_INCLUDE_UM@"
+  "@SDK_INCLUDE_SHARED@")
+
+# Link Directories
+link_directories(BEFORE
+  "@RUNTIME_LIB@"
+  "@SDK_LIB_UCRT@"
+  "@SDK_LIB_UM@")
+
+# WinRT
+add_library(winrt INTERFACE)
+target_include_directories(winrt INTERFACE
+  "@SDK_INCLUDE_WINRT@")
+
+# C++/WinRT
+add_library(cppwinrt INTERFACE)
+target_link_libraries(cppwinrt INTERFACE winrt)
+target_include_directories(cppwinrt INTERFACE
+  "@SDK_INCLUDE_CPPWINRT@")
