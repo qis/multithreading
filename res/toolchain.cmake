@@ -52,30 +52,27 @@ if(VCPKG)
   set(VCPKG_APPLOCAL_DEPS OFF)
 
   include("${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
-  include("${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share/toolchain.cmake")
-
-  file(GLOB TOOLCHAIN_DLLS "${CMAKE_BINARY_DIR}/vcpkg_installed/${VCPKG_TARGET_TRIPLET}/bin/*.dll")
-  foreach(TOOLCHAIN_DLL ${TOOLCHAIN_DLLS})
-    get_filename_component(TOOLCHAIN_DLL_NAME "${TOOLCHAIN_DLL}" NAME)
-    configure_file(${TOOLCHAIN_DLL} "${CMAKE_BINARY_DIR}/bin/${TOOLCHAIN_DLL_NAME}" COPYONLY)
-  endforeach()
+  if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+    include("${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share/toolchain.cmake")
+    file(GLOB TOOLCHAIN_DLLS "${CMAKE_BINARY_DIR}/vcpkg_installed/${VCPKG_TARGET_TRIPLET}/bin/*.dll")
+    foreach(TOOLCHAIN_DLL ${TOOLCHAIN_DLLS})
+      get_filename_component(TOOLCHAIN_DLL_NAME "${TOOLCHAIN_DLL}" NAME)
+      configure_file(${TOOLCHAIN_DLL} "${CMAKE_BINARY_DIR}/bin/${TOOLCHAIN_DLL_NAME}" COPYONLY)
+    endforeach()
+  endif()
 
   set(VCPKG_FOUND ON CACHE BOOL "")
 endif()
 
 # Standard
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
-  add_compile_options(/std:c++latest /utf-8)
+  cmake_policy(SET CMP0092 NEW)
+  add_compile_options(/std:c++latest /utf-8 /W4 /wd4100)
 else()
   set(CMAKE_CXX_STANDARD 26 CACHE STRING "")
   set(CMAKE_CXX_EXTENSIONS OFF CACHE BOOL "")
   set(CMAKE_CXX_SCAN_FOR_MODULES OFF CACHE BOOL "")
 endif()
-
-# Compiler Flags
-cmake_policy(SET CMP0092 NEW)
-string(APPEND CMAKE_C_FLAGS_INIT " /W4 /wd4100")
-string(APPEND CMAKE_CXX_FLAGS_INIT " /W4 /wd4100")
 
 # Debug Information
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
