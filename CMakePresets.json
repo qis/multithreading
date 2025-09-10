@@ -16,8 +16,7 @@
       "cacheVariables": {
         "CMAKE_CXX_SCAN_FOR_MODULES": false,
         "CMAKE_EXPORT_COMPILE_COMMANDS": true,
-        "CMAKE_VERBOSE_MAKEFILE": false,
-        "VCPKG_HOST_TRIPLET": "native"
+        "CMAKE_VERBOSE_MAKEFILE": false
       },
       "toolset": {
         "strategy": "external",
