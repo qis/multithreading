@@ -1,3 +1,5 @@
+#include "main.hpp"
+
 // Prints the `text` to stdout, appends '\n' and flushes the stream in a thread-safe manner.
 // Should not be used by the final logger implementation. Useful for debugging.
 void print(std::string_view text);
@@ -22,27 +24,27 @@ constexpr T* reverse(T* head) noexcept {
 
 class logger {
 public:
-  // Queues the message. Called from multiple threads.
-  void post(std::string text) {
-    queue_.emplace_back(std::move(text));
+  logger() = default;
+  ~logger() {
+    shutdown();
   }
+  logger(const logger&) = delete;
+  logger& operator=(const logger&) = delete;
 
-  // Processes messages. Called from a single thread.
-  void run(std::stop_token stop) {
-    while (true) {
-      while (queue_.empty()) {
-        if (stop.stop_requested())
-          return;
-        std::this_thread::sleep_for(100ms);
-      }
-      for (const auto& e : std::exchange(queue_, {}))
-        std::fputs(e.data(), stdout);
-      std::fflush(stdout);
-    }
+  void post(std::string text) noexcept;
+
+  void run(std::stop_token st);
+
+  void shutdown() {
+    closing_.store(true, std::memory_order_relaxed);
+    cv_.notify_all();
   }
 
 private:
   std::deque<std::string> queue_;
+  std::mutex m_;
+  std::condition_variable cv_;
+  std::atomic<bool> closing_{false};
 };
 
 #define logger logger
